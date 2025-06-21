@@ -1,161 +1,80 @@
 
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import {
-  LayoutDashboard,
-  Calendar,
-  Users,
-  Scissors,
-  PackageOpen,
-  DollarSign,
-  CreditCard,
-  FileText,
-  Settings,
-  Menu,
-  X,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { 
+  Calendar, 
+  Users, 
+  CreditCard, 
+  BarChart3, 
+  Settings,
+  DollarSign,
+  Home
+} from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 
-type SidebarItem = {
-  icon: React.ElementType;
-  label: string;
-  path: string;
-};
+interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-const sidebarItems: SidebarItem[] = [
-  {
-    icon: LayoutDashboard,
-    label: "Dashboard",
-    path: "/",
-  },
-  {
-    icon: Calendar,
-    label: "Agenda",
-    path: "/agenda",
-  },
-  {
-    icon: Users,
-    label: "Clientes",
-    path: "/clientes",
-  },
-  {
-    icon: Scissors,
-    label: "Serviços",
-    path: "/servicos",
-  },
-  {
-    icon: PackageOpen,
-    label: "Estoque",
-    path: "/estoque",
-  },
-  {
-    icon: DollarSign,
-    label: "Finanças",
-    path: "/financas",
-  },
-  {
-    icon: CreditCard,
-    label: "Pagamentos",
-    path: "/pagamentos",
-  },
-  {
-    icon: FileText,
-    label: "Relatórios",
-    path: "/relatorios",
-  },
-  {
-    icon: Settings,
-    label: "Configurações",
-    path: "/configuracoes",
-  },
-];
-
-const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+export function Sidebar({ className }: SidebarProps) {
   const location = useLocation();
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
-  // Função para determinar se um item está ativo
-  const isActive = (path: string) => location.pathname === path;
+  const routes = [
+    {
+      label: "Dashboard",
+      icon: Home,
+      href: "/dashboard",
+      color: "text-sky-500"
+    },
+    {
+      label: "Agenda",
+      icon: Calendar,
+      href: "/agenda", 
+      color: "text-violet-500"
+    },
+    {
+      label: "Clientes",
+      icon: Users,
+      href: "/clientes",
+      color: "text-pink-700"
+    },
+    {
+      label: "Pagamentos",
+      icon: CreditCard,
+      href: "/pagamentos",
+      color: "text-orange-700"
+    },
+    {
+      label: "Gerenciar Serviços",
+      icon: Settings,
+      href: "/services-management",
+      color: "text-green-700"
+    }
+  ];
 
   return (
-    <>
-      {/* Mobile menu toggle button */}
-      <div className="fixed top-4 left-4 z-50 lg:hidden">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={toggleSidebar}
-          className="bg-background rounded-md shadow-salon border-salon-secondary"
-        >
-          {isOpen ? (
-            <X className="h-5 w-5 text-salon-primary" />
-          ) : (
-            <Menu className="h-5 w-5 text-salon-primary" />
-          )}
-        </Button>
-      </div>
-
-      {/* Sidebar backdrop for mobile */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={cn(
-          "fixed inset-y-0 left-0 z-40 w-72 transform bg-sidebar border-r border-sidebar-border transition-all duration-300 ease-in-out lg:translate-x-0 flex flex-col",
-          isOpen ? "translate-x-0 shadow-xl" : "-translate-x-full"
-        )}
-      >
-        <div className="flex h-24 items-center justify-center border-b border-sidebar-border bg-salon-primary/5">
-          <h1 className="font-playfair text-2xl font-semibold text-salon-primary">
-            Dellas - Cabelo & Pele
-          </h1>
-        </div>
-
-        <nav className="flex-1 overflow-y-auto p-5 space-y-2">
-          {sidebarItems.map((item) => {
-            const active = isActive(item.path);
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => setIsOpen(false)}
-                className={cn(
-                  "flex items-center gap-4 rounded-md px-4 py-3 text-sidebar-foreground transition-all",
-                  active
-                    ? "bg-salon-primary text-white shadow-sm"
-                    : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                )}
+    <div className={cn("pb-12", className)}>
+      <div className="space-y-4 py-4">
+        <div className="px-3 py-2">
+          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+            Beleza Agendada
+          </h2>
+          <div className="space-y-1">
+            {routes.map((route) => (
+              <Button
+                key={route.href}
+                variant={location.pathname === route.href ? "secondary" : "ghost"}
+                className="w-full justify-start"
+                asChild
               >
-                <item.icon className="h-5 w-5" />
-                <span className="font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="p-4 border-t border-sidebar-border">
-          <div className="p-4 rounded-md bg-salon-primary/10 text-center">
-            <p className="text-sm font-medium text-sidebar-foreground">
-              Dellas - Cabelo & Pele
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Beleza & Bem-estar
-            </p>
+                <Link to={route.href}>
+                  <route.icon className={cn("mr-2 h-4 w-4", route.color)} />
+                  {route.label}
+                </Link>
+              </Button>
+            ))}
           </div>
         </div>
-      </aside>
-    </>
+      </div>
+    </div>
   );
-};
-
-export default Sidebar;
+}

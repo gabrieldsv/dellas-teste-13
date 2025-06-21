@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
 import { i18n } from "@/lib/i18n";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Link } from "react-router-dom";
 
 import {
   Dialog,
@@ -15,6 +16,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Settings, AlertTriangle } from "lucide-react";
 
 import AppointmentClientSelect from "./modal/AppointmentClientSelect";
 import AppointmentServiceSelect from "./modal/AppointmentServiceSelect";
@@ -115,6 +118,9 @@ const AppointmentModal = ({
     }
   };
 
+  // Check if there are services with zero price
+  const hasZeroPriceServices = services.some(service => service.price === 0);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
@@ -126,6 +132,26 @@ const AppointmentModal = ({
             {appointment ? "Editar Agendamento" : "Novo Agendamento"}
           </DialogTitle>
         </DialogHeader>
+
+        {/* Alert for zero price services */}
+        {hasZeroPriceServices && (
+          <div className="p-4 sm:p-6 pb-0">
+            <Alert className="border-amber-200 bg-amber-50">
+              <AlertTriangle className="h-4 w-4 text-amber-600" />
+              <AlertDescription className="text-amber-700">
+                <div className="flex items-center justify-between">
+                  <span>Alguns serviços não têm preço definido.</span>
+                  <Link to="/services-management">
+                    <Button variant="outline" size="sm" className="gap-2 ml-2">
+                      <Settings className="h-3 w-3" />
+                      Gerenciar
+                    </Button>
+                  </Link>
+                </div>
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
 
         <ScrollArea className="max-h-[calc(85vh-120px)]">
           <Form {...form}>
